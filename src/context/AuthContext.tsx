@@ -117,7 +117,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!response.ok) throw new Error(data.error);
     setStoredTokens(data.accessToken, data.refreshToken);
     document.cookie = `accessToken=${data.accessToken}; path=/; max-age=900`;
-    setUser({ id: data.id, name: data.name, email: data.email, role: data.role });
+    const userData = { id: data.id, name: data.name, email: data.email, role: data.role };
+    setUser(userData);
+    return userData;
   };
 
   const register = async (name: string, email: string, password: string) => {

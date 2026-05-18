@@ -24,8 +24,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
-      const user = await (await fetch('http://localhost:3001/api/auth/me', { credentials: 'include' })).json();
+      const user = await login(email, password);
       router.push(user.role === 'SUPERADMIN' ? '/admin' : user.role === 'DENTIST' ? '/dentist' : '/user');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
