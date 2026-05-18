@@ -1,11 +1,17 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dentalcareback.onrender.com';
 
+const getAuthHeader = () => {
+  if (typeof window === 'undefined') return {};
+  const accessToken = localStorage.getItem('accessToken');
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+};
+
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...getAuthHeader(),
       ...options.headers,
     },
   });

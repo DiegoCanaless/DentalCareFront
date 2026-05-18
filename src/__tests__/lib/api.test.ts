@@ -6,33 +6,34 @@ global.fetch = mockFetch;
 describe('API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    global.localStorage.getItem.mockReturnValue(null);
   });
 
   describe('auth', () => {
     it('register calls correct endpoint', async () => {
       mockFetch.mockResolvedValueOnce({
-        json: jest.fn().mockResolvedValue({ id: 1, name: 'Test' }),
+        json: jest.fn().mockResolvedValue({ id: 1, name: 'Test', accessToken: 'token', refreshToken: 'refresh' }),
         ok: true,
       });
       
       await api.auth.register({ name: 'Test', email: 'test@test.com', password: 'password' });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/auth/register',
+        'https://dentalcareback.onrender.com/api/auth/register',
         expect.objectContaining({ method: 'POST' })
       );
     });
 
     it('login calls correct endpoint', async () => {
       mockFetch.mockResolvedValueOnce({
-        json: jest.fn().mockResolvedValue({ id: 1, email: 'test@test.com' }),
+        json: jest.fn().mockResolvedValue({ id: 1, email: 'test@test.com', accessToken: 'token', refreshToken: 'refresh' }),
         ok: true,
       });
       
       await api.auth.login({ email: 'test@test.com', password: 'password' });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/auth/login',
+        'https://dentalcareback.onrender.com/api/auth/login',
         expect.objectContaining({ method: 'POST' })
       );
     });
@@ -46,12 +47,14 @@ describe('API', () => {
       await api.auth.logout();
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/auth/logout',
+        'https://dentalcareback.onrender.com/api/auth/logout',
         expect.objectContaining({ method: 'POST' })
       );
     });
 
-    it('me calls correct endpoint', async () => {
+    it('me sends authorization header', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('test-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({ id: 1, name: 'Test' }),
         ok: true,
@@ -60,8 +63,10 @@ describe('API', () => {
       await api.auth.me();
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/auth/me',
-        expect.objectContaining({ credentials: 'include' })
+        'https://dentalcareback.onrender.com/api/auth/me',
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: 'Bearer test-token' })
+        })
       );
     });
   });
@@ -101,6 +106,8 @@ describe('API', () => {
     });
 
     it('create sends correct data', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('admin-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({ id: 1 }),
         ok: true,
@@ -109,12 +116,17 @@ describe('API', () => {
       await api.treatments.create({ name: 'New', description: 'Desc', duration: 30, price: 100, icon: '🪥' });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/treatments',
-        expect.objectContaining({ method: 'POST' })
+        'https://dentalcareback.onrender.com/api/treatments',
+        expect.objectContaining({ 
+          method: 'POST',
+          headers: expect.objectContaining({ Authorization: 'Bearer admin-token' })
+        })
       );
     });
 
     it('delete calls correct endpoint', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('admin-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({}),
         ok: true,
@@ -123,8 +135,11 @@ describe('API', () => {
       await api.treatments.delete(1);
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/treatments/1',
-        expect.objectContaining({ method: 'DELETE' })
+        'https://dentalcareback.onrender.com/api/treatments/1',
+        expect.objectContaining({ 
+          method: 'DELETE',
+          headers: expect.objectContaining({ Authorization: 'Bearer admin-token' })
+        })
       );
     });
   });
@@ -150,12 +165,14 @@ describe('API', () => {
       await api.appointments.list({ date: '2024-01-01', status: 'pending' });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/appointments?date=2024-01-01&status=pending',
+        'https://dentalcareback.onrender.com/api/appointments?date=2024-01-01&status=pending',
         expect.any(Object)
       );
     });
 
     it('create sends correct data', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('user-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({ id: 1 }),
         ok: true,
@@ -164,8 +181,11 @@ describe('API', () => {
       await api.appointments.create({ date: '2024-01-01', time: '10:00', treatmentId: 1 });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/appointments',
-        expect.objectContaining({ method: 'POST' })
+        'https://dentalcareback.onrender.com/api/appointments',
+        expect.objectContaining({ 
+          method: 'POST',
+          headers: expect.objectContaining({ Authorization: 'Bearer user-token' })
+        })
       );
     });
 
@@ -183,6 +203,8 @@ describe('API', () => {
 
   describe('users', () => {
     it('list returns users', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('admin-token');
+      
       const users = [{ id: 1, name: 'Admin' }];
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue(users),
@@ -205,6 +227,8 @@ describe('API', () => {
     });
 
     it('create user sends correct data', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('admin-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({ id: 1 }),
         ok: true,
@@ -213,12 +237,17 @@ describe('API', () => {
       await api.users.create({ name: 'New', email: 'new@test.com', password: 'pass', role: 'USER' });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/users',
-        expect.objectContaining({ method: 'POST' })
+        'https://dentalcareback.onrender.com/api/users',
+        expect.objectContaining({ 
+          method: 'POST',
+          headers: expect.objectContaining({ Authorization: 'Bearer admin-token' })
+        })
       );
     });
 
     it('delete calls correct endpoint', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('admin-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({}),
         ok: true,
@@ -227,8 +256,11 @@ describe('API', () => {
       await api.users.delete(1);
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/users/1',
-        expect.objectContaining({ method: 'DELETE' })
+        'https://dentalcareback.onrender.com/api/users/1',
+        expect.objectContaining({ 
+          method: 'DELETE',
+          headers: expect.objectContaining({ Authorization: 'Bearer admin-token' })
+        })
       );
     });
   });
@@ -255,8 +287,10 @@ describe('API', () => {
     });
   });
 
-  describe('options', () => {
-    it('includes credentials: include', async () => {
+  describe('Authorization header', () => {
+    it('sends Authorization header when token exists', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue('my-token');
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({}),
         ok: true,
@@ -266,24 +300,24 @@ describe('API', () => {
       
       expect(mockFetch).toHaveBeenCalledWith(
         expect.any(String),
-        expect.objectContaining({ credentials: 'include' })
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: 'Bearer my-token' })
+        })
       );
     });
 
-    it('includes Content-Type header', async () => {
+    it('sends no Authorization header when no token', async () => {
+      (global.localStorage.getItem as jest.Mock).mockReturnValue(null);
+      
       mockFetch.mockResolvedValueOnce({
         json: jest.fn().mockResolvedValue({}),
         ok: true,
       });
       
-      await api.auth.login({ email: 'test@test.com', password: 'pass' });
+      await api.auth.register({ name: 'Test', email: 'test@test.com', password: 'pass' });
       
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
-        })
-      );
+      const callArgs = mockFetch.mock.calls[0][1];
+      expect(callArgs.headers.Authorization).toBeUndefined();
     });
   });
 });

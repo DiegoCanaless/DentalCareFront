@@ -77,3 +77,14 @@ jest.mock('lucide-react', () => ({
 
 // Mock API calls
 global.fetch = jest.fn();
+
+// Mock localStorage
+Object.defineProperty(global, 'localStorage', {
+  value: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  },
+  writable: true,
+});
