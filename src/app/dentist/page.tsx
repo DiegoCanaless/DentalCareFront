@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/api';
 import { toLocalDateString, getToday, getTomorrow } from '@/lib/utils';
+import { useSocket } from '@/lib/useSocket';
 import {
   Calendar, Check, X, Clock, Users, Star, Plus, Edit2, Trash2,
   ChevronLeft, ChevronRight, Sparkles, Sun, Shield, Braces, Scissors, Stethoscope, TrendingUp, DollarSign, RotateCcw
@@ -51,6 +52,22 @@ export default function DentistDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
+
+  const { isConnected } = useSocket({
+    onAppointmentCreated: (newAppointment) => {
+      setAppointments(prev => [...prev, newAppointment as Appointment]);
+    },
+    onAppointmentUpdated: (updatedAppointment) => {
+      setAppointments(prev => prev.map(a => 
+        a.id === updatedAppointment.id ? { ...a, ...updatedAppointment } : a
+      ));
+    },
+    onAppointmentCancelled: ({ id }) => {
+      setAppointments(prev => prev.map(a => 
+        a.id === id ? { ...a, status: 'CANCELLED' } : a
+      ));
+    },
+  });
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [treatments, setTreatments] = useState<Treatment[]>([]);

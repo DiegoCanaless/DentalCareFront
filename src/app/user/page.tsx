@@ -15,6 +15,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Pagination } from '@/components/ui/Pagination';
 import { api } from '@/lib/api';
 import { formatPrice, formatDuration, toLocalDateString, getTomorrow, getToday } from '@/lib/utils';
+import { useSocket } from '@/lib/useSocket';
 import { Calendar, Clock, Sparkles, User, ChevronLeft, ChevronRight, CheckCircle, X, AlertCircle } from 'lucide-react';
 
 interface Treatment {
@@ -39,6 +40,22 @@ export default function UserDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
+
+  useSocket({
+    onAppointmentCreated: (newAppointment) => {
+      setAppointments(prev => [...prev, newAppointment as Appointment]);
+    },
+    onAppointmentUpdated: (updatedAppointment) => {
+      setAppointments(prev => prev.map(a => 
+        a.id === updatedAppointment.id ? { ...a, ...updatedAppointment } : a
+      ));
+    },
+    onAppointmentCancelled: ({ id }) => {
+      setAppointments(prev => prev.map(a => 
+        a.id === id ? { ...a, status: 'CANCELLED' } : a
+      ));
+    },
+  });
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [treatments, setTreatments] = useState<Treatment[]>([]);

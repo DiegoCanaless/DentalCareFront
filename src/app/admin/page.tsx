@@ -39,6 +39,7 @@ interface Treatment {
 
 interface Stats {
   totalUsers: number;
+  totalPatients: number;
   totalDentists: number;
   pendingAppointments: number;
   confirmedAppointments: number;
