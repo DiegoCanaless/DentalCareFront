@@ -225,10 +225,10 @@ export default function AdminDashboard() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             {[
-              { label: 'Pacientes', value: stats.totalUsers - stats.totalDentists, icon: Users, color: 'from-primary to-primary-dark' },
-              { label: 'Dentistas', value: stats.totalDentists, icon: Stethoscope, color: 'from-emerald-500 to-emerald-600' },
-              { label: 'Citas este Mes', value: stats.pendingAppointments + stats.confirmedAppointments + stats.completedAppointments, icon: Calendar, color: 'from-blue-500 to-blue-600' },
-              { label: 'Ingresos del Mes', value: `$${stats.monthlyRevenue}`, icon: DollarSign, color: 'from-amber-500 to-amber-600' },
+              { label: 'Pacientes', value: stats.totalPatients.toLocaleString('es-AR'), icon: Users, color: 'from-primary to-primary-dark' },
+              { label: 'Dentistas', value: stats.totalDentists.toLocaleString('es-AR'), icon: Stethoscope, color: 'from-emerald-500 to-emerald-600' },
+              { label: 'Citas este Mes', value: (stats.pendingAppointments + stats.confirmedAppointments + stats.completedAppointments).toLocaleString('es-AR'), icon: Calendar, color: 'from-blue-500 to-blue-600' },
+              { label: 'Ingresos del Mes', value: `$${stats.monthlyRevenue.toLocaleString('es-AR')}`, icon: DollarSign, color: 'from-amber-500 to-amber-600' },
             ].map((stat, index) => (
               <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
                 <Card className={`bg-gradient-to-r ${stat.color} text-white border-0 shadow-lg p-4 md:p-6`}>

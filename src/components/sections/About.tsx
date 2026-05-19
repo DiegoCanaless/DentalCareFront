@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/Card';
-import { Award, Users, Heart } from 'lucide-react';
+import { Award, Users, Heart, Smile } from 'lucide-react';
 
 export function About() {
   return (
@@ -17,9 +17,11 @@ export function About() {
           >
             <div className="relative aspect-[4/3] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-primary/10">
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Heart className="w-32 md:w-40 lg:w-48 text-white/20" strokeWidth={1} />
-                </div>
+                <img 
+                  src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=600&fit=crop&auto=format" 
+                  alt="Clínica Dental"
+                  className="w-full h-full object-cover opacity-80"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent" />
               </div>
             </div>
@@ -64,14 +66,14 @@ export function About() {
             <div className="grid grid-cols-2 gap-5 md:gap-6 pt-6">
               <Card className="text-center" padding="sm">
                 <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                  <Users className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+                  <Smile className="w-6 h-6 md:w-7 md:h-7 text-primary" />
                 </div>
-                <p className="font-semibold text-text-primary">+500 Pacientes</p>
-                <p className="text-sm text-text-secondary">Activos</p>
+                <p className="font-semibold text-text-primary">+500</p>
+                <p className="text-sm text-text-secondary">Pacientes</p>
               </Card>
               <Card className="text-center" padding="sm">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-error/10 flex items-center justify-center mx-auto mb-3">
-                  <Heart className="w-6 h-6 md:w-7 md:h-7 text-error" />
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-accent/10 flex items-center justify-center mx-auto mb-3">
+                  <Heart className="w-6 h-6 md:w-7 md:h-7 text-accent" />
                 </div>
                 <p className="font-semibold text-text-primary">+1000</p>
                 <p className="text-sm text-text-secondary">Tratamientos</p>

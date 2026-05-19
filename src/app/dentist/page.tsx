@@ -15,7 +15,7 @@ import { api } from '@/lib/api';
 import { toLocalDateString, getToday, getTomorrow } from '@/lib/utils';
 import {
   Calendar, Check, X, Clock, Users, Star, Plus, Edit2, Trash2,
-  ChevronLeft, ChevronRight, Sparkles, Sun, Shield, Braces, Scissors, Stethoscope, TrendingUp, DollarSign
+  ChevronLeft, ChevronRight, Sparkles, Sun, Shield, Braces, Scissors, Stethoscope, TrendingUp, DollarSign, RotateCcw
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -117,10 +117,12 @@ export default function DentistDashboard() {
 
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = toLocalDateString(date);
-    return appointments.filter(a => {
+    const filtered = appointments.filter(a => {
       const appointmentDate = a.date.split('T')[0];
       return appointmentDate === dateStr && (statusFilter === 'all' || a.status === statusFilter);
     });
+    const statusOrder: Record<string, number> = { PENDING: 0, CONFIRMED: 1, COMPLETED: 2, CANCELLED: 3 };
+    return filtered.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
   };
 
   const getAppointmentCountForDate = (date: Date) => {
@@ -130,21 +132,24 @@ export default function DentistDashboard() {
 
   const getStats = () => {
     const today = getToday();
-    const tomorrow = getTomorrow();
+    const todayStr = toLocalDateString(today);
+
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay());
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
 
+    const activeAppointments = appointments.filter(a => ['PENDING', 'CONFIRMED', 'COMPLETED'].includes(a.status));
+
     return {
-      today: appointments.filter(a => ['PENDING', 'CONFIRMED'].includes(a.status) && a.date.split('T')[0] === toLocalDateString(today)).length,
-      week: appointments.filter(a => {
-        const aptDate = new Date(a.date + 'T00:00:00Z');
-        return ['PENDING', 'CONFIRMED'].includes(a.status) && aptDate >= weekStart && aptDate <= weekEnd;
+      today: activeAppointments.filter(a => a.date.split('T')[0] === todayStr).length,
+      week: activeAppointments.filter(a => {
+        const aptDate = a.date.split('T')[0];
+        return aptDate >= toLocalDateString(weekStart) && aptDate <= toLocalDateString(weekEnd);
       }).length,
-      month: appointments.filter(a => {
-        const aptDate = new Date(a.date + 'T00:00:00Z');
-        return ['PENDING', 'CONFIRMED'].includes(a.status) && aptDate.getMonth() === today.getMonth() && aptDate.getFullYear() === today.getFullYear();
+      month: activeAppointments.filter(a => {
+        const aptDate = new Date(a.date);
+        return aptDate.getMonth() === today.getMonth() && aptDate.getFullYear() === today.getFullYear();
       }).length,
     };
   };
@@ -261,31 +266,36 @@ export default function DentistDashboard() {
                               <p className="text-xs sm:text-sm text-text-secondary truncate">{appointment.treatment.name} • {appointment.time}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                            <Badge variant={statusLabels[appointment.status].variant} className="text-xs">{statusLabels[appointment.status].label}</Badge>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <Badge variant={statusLabels[appointment.status].variant} className="text-xs font-medium">{statusLabels[appointment.status].label}</Badge>
                             {appointment.status === 'PENDING' && (
-                              <>
-                                <button onClick={() => updateAppointmentStatus(appointment.id, 'CONFIRMED')} className="p-1.5 rounded-lg hover:bg-success/10 transition-colors cursor-pointer" title="Confirmar">
-                                  <Check className="w-4 h-4 text-success" />
+                              <div className="flex gap-1.5">
+                                <button onClick={() => updateAppointmentStatus(appointment.id, 'CONFIRMED')} className="group relative flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all cursor-pointer" title="Confirmar">
+                                  <Check className="w-4 h-4" />
+                                  <span>Confirmar</span>
                                 </button>
-                                <button onClick={() => updateAppointmentStatus(appointment.id, 'CANCELLED')} className="p-1.5 rounded-lg hover:bg-error/10 transition-colors cursor-pointer" title="Cancelar">
-                                  <X className="w-4 h-4 text-error" />
+                                <button onClick={() => updateAppointmentStatus(appointment.id, 'CANCELLED')} className="group relative flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border-2 border-red-200 hover:border-red-400 text-red-500 hover:text-red-600 font-semibold text-sm hover:bg-red-50 hover:-translate-y-0.5 transition-all cursor-pointer" title="Cancelar">
+                                  <X className="w-4 h-4" />
+                                  <span>Cancelar</span>
                                 </button>
-                              </>
+                              </div>
                             )}
                             {appointment.status === 'CONFIRMED' && (
-                              <>
-                                <button onClick={() => updateAppointmentStatus(appointment.id, 'COMPLETED')} className="p-1.5 rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" title="Completar">
-                                  <Check className="w-4 h-4 text-primary" />
+                              <div className="flex gap-1.5">
+                                <button onClick={() => updateAppointmentStatus(appointment.id, 'COMPLETED')} className="group relative flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white font-semibold text-sm shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all cursor-pointer" title="Completar">
+                                  <Check className="w-4 h-4" />
+                                  <span>Completar</span>
                                 </button>
-                                <button onClick={() => updateAppointmentStatus(appointment.id, 'CANCELLED')} className="p-1.5 rounded-lg hover:bg-error/10 transition-colors cursor-pointer" title="Cancelar">
-                                  <X className="w-4 h-4 text-error" />
+                                <button onClick={() => updateAppointmentStatus(appointment.id, 'CANCELLED')} className="group relative flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border-2 border-red-200 hover:border-red-400 text-red-500 hover:text-red-600 font-semibold text-sm hover:bg-red-50 hover:-translate-y-0.5 transition-all cursor-pointer" title="Cancelar">
+                                  <X className="w-4 h-4" />
+                                  <span>Cancelar</span>
                                 </button>
-                              </>
+                              </div>
                             )}
                             {appointment.status === 'COMPLETED' && (
-                              <button onClick={() => updateAppointmentStatus(appointment.id, 'CONFIRMED')} className="p-1.5 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer" title="Revertir a confirmado">
-                                <X className="w-4 h-4 text-amber-500" />
+                              <button onClick={() => updateAppointmentStatus(appointment.id, 'CONFIRMED')} className="group relative flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border-2 border-amber-300 hover:border-amber-400 text-amber-600 hover:text-amber-700 font-semibold text-sm hover:bg-amber-50 hover:-translate-y-0.5 transition-all cursor-pointer" title="Revertir a confirmado">
+                                <RotateCcw className="w-4 h-4" />
+                                <span>Revertir</span>
                               </button>
                             )}
                           </div>

@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-import { Calendar, Heart, Sparkles } from 'lucide-react';
+import { Calendar, Heart, Star, Trophy, Smile } from 'lucide-react';
 import Link from 'next/link';
 
 export function Hero() {
@@ -62,13 +62,13 @@ export function Hero() {
             
             <div className="flex items-center gap-6 md:gap-10 pt-6 border-t border-slate-200/60">
               {[
-                { value: '500+', label: 'Pacientes', icon: '✨' },
-                { value: '15+', label: 'Años', icon: '🏆' },
-                { value: '98%', label: 'Satisfacción', icon: '💯' },
+                { value: '500+', label: 'Pacientes', icon: Smile, iconColor: 'text-primary' },
+                { value: '15+', label: 'Años', icon: Trophy, iconColor: 'text-accent' },
+                { value: '98%', label: 'Satisfacción', icon: Star, iconColor: 'text-yellow-500' },
               ].map((stat, i) => (
                 <div key={i} className="text-center group">
                   <div className="flex items-center justify-center gap-1.5 mb-1">
-                    <span className="text-lg">{stat.icon}</span>
+                    <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
                     <p className="text-3xl md:text-4xl font-bold text-text-primary font-['Outfit']">{stat.value}</p>
                   </div>
                   <p className="text-sm font-medium text-text-secondary">{stat.label}</p>
@@ -87,11 +87,15 @@ export function Hero() {
               <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-primary-dark rounded-[3rem] shadow-2xl shadow-primary/15" />
               <div className="absolute inset-3 bg-white/5 backdrop-blur-sm rounded-[2rem] border border-white/10" />
               
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  <Heart className="w-32 lg:w-40 text-white/30" strokeWidth={1} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent rounded-full blur-xl" />
-                </div>
+              <div className="absolute inset-0 flex items-center justify-center p-8">
+                <div className="w-full h-full rounded-2xl overflow-hidden relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=600&h=600&fit=crop" 
+                  alt="Sonrisa perfecta"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
+              </div>
               </div>
               
               <motion.div
@@ -111,22 +115,7 @@ export function Hero() {
                 </div>
               </motion.div>
 
-              <motion.div
-                initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
-                animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                transition={{ delay: prefersReducedMotion ? 0 : 0.7 }}
-                className="absolute top-8 left-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl shadow-primary/10 border border-white/50 p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-text-primary text-sm">Blanqueamiento</p>
-                    <p className="text-xs text-text-secondary">30% OFF</p>
-                  </div>
-                </div>
-              </motion.div>
+              
             </div>
           </motion.div>
         </div>
