@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   
   const [users, setUsers] = useState<UserData[]>([]);
   const [treatments, setTreatments] = useState<Treatment[]>([]);
-  const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalDentists: 0, pendingAppointments: 0, confirmedAppointments: 0, completedAppointments: 0, monthlyRevenue: 0 });
+  const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalPatients: 0, totalDentists: 0, pendingAppointments: 0, confirmedAppointments: 0, completedAppointments: 0, monthlyRevenue: 0 });
   const [loading, setLoading] = useState(true);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
