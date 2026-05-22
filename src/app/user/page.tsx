@@ -45,9 +45,9 @@ export default function UserDashboard() {
     onAppointmentCreated: (newAppointment) => {
       setAppointments(prev => [...prev, newAppointment as Appointment]);
     },
-    onAppointmentUpdated: (updatedAppointment) => {
+    onAppointmentUpdated: ({ id, date, time, status }) => {
       setAppointments(prev => prev.map(a => 
-        a.id === updatedAppointment.id ? { ...a, ...updatedAppointment } : a
+        a.id === id ? { ...a, date, time, status } : a
       ));
     },
     onAppointmentCancelled: ({ id }) => {
